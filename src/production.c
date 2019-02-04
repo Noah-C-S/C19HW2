@@ -2,7 +2,7 @@
  * production.c
  *
  *  Created on: Nov 3, 2018
- *      Author: student
+ *      Author: Noah Capucilli-Shatan
  */
 
 #include <stdbool.h>
@@ -201,7 +201,7 @@ void getInitial(FILE *input, int rows, int cols, char output[rows][cols]){
 				index--; //put the index back before the Newline so it doesn't get skipped twice
 				break; //everything after this in the row should be blank anyway, so go to the next row
 			}
-			if(nextChar == endCharacter) return; //once we reach the end of the file, we are done. END returns the completed array.
+			if(nextChar == endCharacter) return; //once we reach the end of the file, we are done.
 			if(nextChar == FILLEDCHAR) output[r][col] = FILLEDCHAR; //don't need to do anything for unfilled spaces
 		}
 		index++; //skip the newline character
@@ -237,7 +237,9 @@ void printBoard(int rows, int cols, char board[rows][cols]){
  */
 void boardCopy(int rows, int cols, char board1[rows][cols], char board2[rows][cols]){
 	for(int i = 0; i < rows; i++){
-		strcpy(board2[i], board1[i]); //copy each individual board using strcpy
+		for(int j = 0; j < cols; j++){
+			board2[i][j] = board1[i][j];
+		}
 	}
 }
 
@@ -250,11 +252,12 @@ void boardCopy(int rows, int cols, char board1[rows][cols], char board2[rows][co
  * @return true if the boards are equal, false otherwise
  */
 bool boardEql(int rows, int cols, char board1[rows][cols], char board2[rows][cols]){
-	bool equal = true;
 	for(int i = 0; i < rows; i++){
-		if (strcmp(board2[i], board1[i]) != 0) equal = false; //use strcmp to compare each individual row in each board.
+		for(int j = 0; j < cols; j++){
+			if(board1[i][j] != board2[i][j]) return false;
+		}
 	}
-	return equal;
+	return true;
 }
 /**
  * Figures out if a board is dead (has no organisms remaining)

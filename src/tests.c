@@ -2,7 +2,7 @@
  * tests.c
  *
  *  Created on: Nov 3, 2018
- *      Author: student
+ *      Author: Noah Capucilli-Shatan
  */
 #include <stdbool.h>
 #include "tests.h"
@@ -21,6 +21,8 @@ bool tests(void)
 	if(ok2)puts("Was able to allocate the arrays ok.");
 	bool ok3 = testPlayOne();
 	if(ok3)puts("playOne is ok.");
+	bool ok4 = testNeighbors();
+	if(ok4) puts("Neighbors is ok");
 	puts("end of tests");
 	results = ok1 && ok2 && ok3;
 	return results;
@@ -148,34 +150,59 @@ bool testPlayOne(void)
 
 	int nRows = 4;
 	int nCols = 4;
+	//all strings end in "\0", but a "2D array of chars" isn't the same as "an array of strings"
 	char boardBefore[4][4]={
-			{'o','x','o','\0'},
-			{'x','o','x','\0'},
-			{'x','o','x','\0'},
-			{'o','x','o','\0'}
+			{'o','x','o','o'},
+			{'o','x','o','o'},
+			{'o','x','o','o'},
+			{'o','o','o','o'}
 	};
 	char correctBoardAfter[4][4]={
-			{'o','x','o','\0'},
-			{'x','o','x','\0'},
-			{'x','o','x','\0'},
-			{'o','x','o','\0'}
+			{'o','o','o','o'},
+			{'x','x','x','o'},
+			{'o','o','o','o'},
+			{'o','o','o','o'}
 	};
-
 	char boardAfter[nRows][nCols];
+	boardCopy(4,4,boardBefore,boardAfter); //playOne requires both arrays to be the same before running to work properly
 	//here's the invocation
 	PlayOne(nRows, nCols, boardBefore, boardAfter);
 	//here's the check
-	ok1 = true; //no errors found yet
-	for(int row=0;row<nRows;row++)
-	{
-		for(int col=0; col<nCols; col++)
-		{
-			if(boardAfter[row][col] != boardBefore[row][col])
-			{//error found
-				ok1 = false;
-			}
-		}
-	}
-	results = ok1;
+	ok1 = boardEql(nRows, nCols, boardAfter, correctBoardAfter);
+
+	char boardBefore2[4][5]={
+			{'o','o','x','o','o'},
+			{'x','o','x','o','o'},
+			{'o','x','x','o','o'},
+			{'o','o','o','o','o'}
+	};
+	char correctBoardAfter2[4][5]={
+			{'o','x','o','o','o'},
+			{'o','o','x','x','o'},
+			{'o','x','x','o','o'},
+			{'o','o','o','o','o'}
+	};
+
+	char boardAfter2[4][5];
+	boardCopy(4,5,boardBefore2,boardAfter2);
+	//here's the invocation
+	PlayOne(4, 5, boardBefore2, boardAfter2);
+	//here's the check
+	ok2 = boardEql(4, 5, boardAfter2, correctBoardAfter2);
+	results = ok1 && ok2;
 	return results;
+}
+
+bool testNeighbors(void){
+	char board[4][4] ={
+	{'x','o','x','o'},
+	{'x','o','x','o'},
+	{'o','x','x','x'},
+	{'o','o','o','x'}
+	};
+	bool ok1 = (numNeighbors(4,4,0,0,board) == 1);
+	bool ok2 = (numNeighbors(4,4,3,3,board) == 2);
+	bool ok3 = (numNeighbors(4,4,2,2,board) == 4);
+	bool ok4 = (numNeighbors(4,4,0,2,board) == 1);
+	return ok1 && ok2 && ok3 && ok4;
 }

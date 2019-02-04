@@ -110,7 +110,10 @@ bool production(int argc, char* argv[])
 		boardCopy(nRows, nCols, old, standby); //copy old in to standby and new in to old
 		boardCopy(nRows, nCols, new, old); //we don't need standby (would be 3 gens ago) anymore and we don't care what new is (it will be overwritten in the next gen)
 	}
-	if(!print) printBoard(nRows, nCols, old); //print the final board. If print is true, then the final board was already printed.
+	if(!print){
+		printf("Generation %i\n", currentGens);
+		printBoard(nRows, nCols, old); //print the final board. If print is true, then the final board was already printed.
+	}
 	return results;
 
 }

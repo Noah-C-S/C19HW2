@@ -11,6 +11,10 @@
 #include <stdlib.h>
 #include <string.h> //for strncmp
 
+/**
+ * Runs all the tests functions
+ * @return true if all the test functions return true, false otherwise
+ */
 bool tests(void)
 {
 	bool results=false;
@@ -27,6 +31,10 @@ bool tests(void)
 	results = ok1 && ok2 && ok3;
 	return results;
 }
+/**
+ * Tests the ability to read inputs
+ * @return true if able to read inputs
+ */
 bool testReadInput(void)
 {
 	//the plan is:
@@ -71,7 +79,8 @@ bool testReadInput(void)
 		ok3 = true;
 		//can we read the correct data?
 		char oRow[4]; //test case, we know a string of 3 chars terminated by null
-		int count =  fscanf(fp, "%s", oRow);
+		//int count =  fscanf(fp, "%s", oRow);
+		fscanf(fp, "%s", oRow);
 		//printf("First row is %s\n", oRow);
 		if(0 != strncmp(oRow, "oxo", 4))//0 means match
 		{//got the right data
@@ -102,6 +111,10 @@ bool testReadInput(void)
 	results = ok1 && ok2 && ok3;
 	return results;
 }
+/**
+ * Tests the ability to make arrays
+ * @return true if able to make arrays
+ */
 bool testMakeArrays(void)
 {
 	bool results = false;
@@ -141,6 +154,10 @@ bool testMakeArrays(void)
 	results = ok1;
 	return results;
 }
+/**
+ * Tests the aPlayOne function
+ * @return true if the playOne function passes all tests, false otherwise
+ */
 bool testPlayOne(void)
 {
 	bool results = false;
@@ -193,6 +210,10 @@ bool testPlayOne(void)
 	return results;
 }
 
+/**
+ * Tests the numNeighbors function
+ * @return true if numNeighbors passes all tests, false otherwise
+ */
 bool testNeighbors(void){
 	char board[4][4] ={
 	{'x','o','x','o'},

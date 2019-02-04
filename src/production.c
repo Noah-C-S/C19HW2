@@ -12,7 +12,7 @@
 #include <math.h>
 #define FILLEDCHAR 'x'
 #define UNFILLEDCHAR 'o'
-
+void getInitial(FILE *input, int rows, int cols, char** output);
 /** Runs the game of life program
  * @param argc the amount of arguments in argv
  * @param argv the arguments passed in the command line
@@ -25,7 +25,7 @@ bool production(int argc, char* argv[])
 	int nRows=-1;
 	int nCols = -1;
 	int gens = 0; //number of generations to play
-	char* inputfile;
+	char inputfile[100];
 	bool print = false;
 	bool pause = false;
 	FILE *file;
@@ -34,12 +34,12 @@ bool production(int argc, char* argv[])
 
 	// Must first check if there are at least 4 arguments on the command line
 	if(argc < 5){
-		printf("Not enough arguments. Usage: ./HW2 NR(int) NC(int) gens(int) inputfile(str) [print(y/n)] [pause(y/n)]");
+		printf("Not enough arguments. Usage: ./HW2 NR(int) NC(int) gens(int) inputfile(str) [print(y/n)] [pause(y/n)]\n");
 		done = true;
 		return results;
 	}
 	if(argc > 7){
-		printf("Too many arguments. Usage: ./HW2 NR(int) NC(int) gens(int) inputfile(str) [print(y/n)] [pause(y/n)]");
+		printf("Too many arguments. Usage: ./HW2 NR(int) NC(int) gens(int) inputfile(str) [print(y/n)] [pause(y/n)]\n");
 		done = true;
 		return results;
 	}
@@ -47,7 +47,7 @@ bool production(int argc, char* argv[])
 	nRows = (int) strtol(argv[1], &ptr, 10); //rows and columns
 	nCols = (int) strtol(argv[2], &ptr, 10);
 	gens = (int) strtol(argv[3], &ptr, 10); //gens
-	inputfile = argv[4]; //file
+	strcpy(inputfile, argv[4]); //file. strcopy is safer than just setting equal IIRC
 	if(argc > 5){
 		print = argv[5][0] == 'y' || argv[5][0] == 'Y'; //technically, anything starting with y would work (such as "yellow"), but this is ok since
 		if(argc > 6){			   //behavior is undefind for anything except 'y' and 'n'.
@@ -67,12 +67,18 @@ bool production(int argc, char* argv[])
 	}
 
 	file = fopen(inputfile, "r");
-	if(file == NULL){
-		printf("The file \"%s\" does not exist!", inputfile);
+	if(file == false){
+		printf("The file \"%s\" does not exist!\n", inputfile);
 		done = true;
 	}
-	if(done) return results;
-
+	if(done) return results; //we encountered an error, so return false;
+	//inputs were all fine, so do stuff
+	char arr1[nRows][nCols];
+	getInitial(file, nRows, nCols, arr1);
+	puts("test");
+	for(int i = 0; i < nRows; i++){
+		puts(arr1[i]);
+	}
 	return results;
 
 }
@@ -91,11 +97,13 @@ void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc])
 
 /** Gets the formatted initial array based on the file input
  * @param input the file to search through
- * @param rows the rows that should be in the returned array
- * @param cols the columns that should be in the returned array
+ * @param rows the rows in the output array
+ * @param cols the columns in the output array
+ * @param output the array to which the generated array should be output, should be of size rows, cols or we will get errors.
  * @return the formatted 2D array of characters to be used as the initial condition.
  */
-char** getInitial(FILE input, int rows, int cols){
+void getInitial(FILE *input, int rows, int cols, char** output){
+	puts("it's called");
 	char characters[(rows + 1)* cols]; //rows+1 * cols because we may need an extra column to store the newline characters
 	int newlines = 0; //newline characters, basically amount of rows
 	int charsSince = 0; //characters since last new line character
@@ -126,10 +134,10 @@ char** getInitial(FILE input, int rows, int cols){
 	} while (c > 0 && newlines < rows); //terminates after end of file or there are too many rows for the array to handle
 	characters[index] = endCharacter; //last character will ALWAYS be newline, but we set it to endCharacter now.
 	//characters is now propagated with all of the relevant characters from the file (characters that can actually be stored in the output array)
-	char output[rows][cols]; //the output array
+	//char output[rows][cols]; //the output array
 	for(int r = 0; r < rows; r++){
 		for(int c = 0; c < cols; c++){
-			output[r][c] = UNFILLEDCHAR; //make an empty board.
+			output[r][c] = UNFILLEDCHAR; //makNULL)e an empty board.
 		}
 	}
 	int startingRow = (rows/2) - (newlines/2); //used to store the initial condition in the approximate middle of the array.
@@ -140,11 +148,10 @@ char** getInitial(FILE input, int rows, int cols){
 		for(int c = startingCol; c < cols; c++){
 			nextChar = characters[index++]; //get the next character
 			if(nextChar == newlineChar) break; //everything after this in the row should be blank anyway, so go to the next row
-			if(nextChar == endCharacter) return output; //once we reach the end of the file, we are done. END returns the completed array.
+			if(nextChar == endCharacter) return; //once we reach the end of the file, we are done. END returns the completed array.
 			if(nextChar == FILLEDCHAR) output[r][c] = FILLEDCHAR; //don't need to do anything for unfilled spaces
 		}
 	}
 
 
-	return output;
 }

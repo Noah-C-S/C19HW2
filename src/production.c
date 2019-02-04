@@ -77,7 +77,10 @@ bool production(int argc, char* argv[])
 	getInitial(file, nRows, nCols, arr1);
 	puts("test");
 	for(int i = 0; i < nRows; i++){
-		printf("%s\n", arr1[i]);
+		for(int j = 0; j < nCols; j++){
+			printf("%c", arr1[i][j]);
+		}
+		printf("\n");
 	}
 	return results;
 
@@ -132,7 +135,6 @@ void getInitial(FILE *input, int rows, int cols, char output[rows][cols]){
 			}
 		}
 	} while (c > 0 && newlines < rows); //terminates after end of file or there are too many rows for the array to handle
-	puts("we here");
 	characters[index-1] = endCharacter; //last character will ALWAYS be newline, but we set it to endCharacter now.
 	printf("%s\n", characters);
 	//characters is now propagated with all of the relevant characters from the file (characters that can actually be stored in the output array)
@@ -145,15 +147,22 @@ void getInitial(FILE *input, int rows, int cols, char output[rows][cols]){
 	puts("even further");
 	int startingRow = (rows/2) - (newlines/2); //used to store the initial condition in the approximate middle of the array.
 	int startingCol = (cols/2) - (maxCharsSince/2); //these are always 0 if the returned array should be full;
+	if(startingRow < 0) startingRow = 0;
+	if(startingCol < 0) startingCol = 0;
 	int nextChar; //the next character in the array.
 	index = 0; //reusing old index variable
+	printf("Sr %i, Sc %i \n", startingRow, startingCol);
 	for(int r = startingRow; r < rows; r++){
 		for(int col = startingCol; col < cols; col++){
 			nextChar = characters[index++]; //get the next character
-			if(nextChar == newlineChar) break; //everything after this in the row should be blank anyway, so go to the next row
+			if(nextChar == newlineChar){
+				index--; //put the index back before the Newline so it doesn't get skipped twice
+				break; //everything after this in the row should be blank anyway, so go to the next row
+			}
 			if(nextChar == endCharacter) return; //once we reach the end of the file, we are done. END returns the completed array.
 			if(nextChar == FILLEDCHAR) output[r][col] = FILLEDCHAR; //don't need to do anything for unfilled spaces
 		}
+		index++; //skip the newline character
 	}
 
 

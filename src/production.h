@@ -15,5 +15,5 @@ void boardCopy(int rows, int cols, char board1[rows][cols], char board2[rows][co
 void getInitial(FILE *input, int rows, int cols, char output[rows][cols]);
 bool boardEql(int rows, int cols, char board1[rows][cols], char board2[rows][cols]);
 bool boardDead(int rows, int cols, char board[rows][cols]);
-int numNeighbors(int rows, int cols, int row, int col, char board[rows][cols])
+int numNeighbors(int rows, int cols, int row, int col, char board[rows][cols]);
 #endif /* PRODUCTION_H_ */

@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "production.h"
 #include <math.h>
+#include <string.h>
 #define FILLEDCHAR 'x'
 #define UNFILLEDCHAR 'o'
 
@@ -73,15 +74,19 @@ bool production(int argc, char* argv[])
 	}
 	if(done) return results; //we encountered an error, so return false;
 	//inputs were all fine, so do stuff
-
 	char old[nRows][nCols], new[nRows][nCols], standby[nRows][nCols]; //the board arrays. old = old array, new = newest array, standby = 2 generations ago
 	getInitial(file, nRows, nCols, old); //store the initial condition in old
+	boardCopy(nRows, nCols, old, new); //copy old in to new (they must be equal before running playOne
+	puts("Generation 0");
 	printBoard(nRows, nCols, old); //print out the initial board
 	int currentGens = 0;
 	//run the actual simulation
 	while(!done){
 		PlayOne(nRows, nCols, old, new);//run playOne on old and new
-		if(print) printBoard(new); //print the board if print is true
+		if(print){
+			printf("Generation %i\n", currentGens + 1);
+			printBoard(nRows, nCols, new); //print the board if print is true
+		}
 		//check if there is an oscillation or steady-state, and exit loop if there is.
 		if(boardEql(nRows, nCols, old, new) || (currentGens > 0  && boardEql(nRows, nCols, standby, new))){ //standby is garbage on the first pass
 			done = true;
@@ -98,7 +103,10 @@ bool production(int argc, char* argv[])
 			done = true;
 			results = true;
 		}
-		if(pause) scanf("");
+		if(pause){
+			puts("Press enter to continue.");
+			getchar();
+		}
 		boardCopy(nRows, nCols, old, standby); //copy old in to standby and new in to old
 		boardCopy(nRows, nCols, new, old); //we don't need standby (would be 3 gens ago) anymore and we don't care what new is (it will be overwritten in the next gen)
 	}
@@ -127,10 +135,10 @@ void PlayOne (unsigned int nr, unsigned int nc, char Old[][nc], char New[][nc])
 				if(neighbors < 2 || neighbors > 3){
 					New[row][col] = UNFILLEDCHAR;
 				}
-				else{ //birth if unoccupied space has exactly 3 neighbors
-					if(neighbors == 3){
-						New[row][col] = FILLEDCHAR;
-					}
+			}
+			else{ //birth if unoccupied space has exactly 3 neighbors
+				if(neighbors == 3){
+					New[row][col] = FILLEDCHAR;
 				}
 			}
 		}
@@ -174,7 +182,6 @@ void getInitial(FILE *input, int rows, int cols, char output[rows][cols]){
 		}
 	} while (c > 0 && newlines < rows); //terminates after end of file or there are too many rows for the array to handle
 	characters[index-1] = endCharacter; //last character will ALWAYS be newline, but we set it to endCharacter now.
-	printf("%s\n", characters);
 	//characters is now propagated with all of the relevant characters from the file (characters that can actually be stored in the output array)
 	for(int r = 0; r < rows; r++){
 		for(int col = 0; col < cols; col++){
@@ -281,7 +288,7 @@ int numNeighbors(int rows, int cols, int row, int col, char board[rows][cols]){
 		for(int j = -1; j <= 1; j++){
 			if(j != 0 || i !=0){ //no need to check the space itself
 				//if the space (row + i, col + j) is on the board and the space (row + i, col + j) is occupied
-				if(row + i > 0 && row + i < rows && col + j > 0 && col + j < rows && board[row+i][col+j] == FILLEDCHAR){
+				if((row + i) >= 0 && (row + i) < rows && (col + j) >= 0 && (col + j) < cols && board[row+i][col+j] == FILLEDCHAR){
 					neighbors++;
 				}
 			}
